@@ -14,8 +14,12 @@ of an iota wallet.
 The goal is that every application which includes the wallet header can run on any
 operation system and any implementation.
 
-IOTA C library: https://github.com/embedded-iota/iota-c-library
+IOTA C library: 
+
+https://github.com/embedded-iota/iota-c-library
+
 RIOS OS (IOTA C library): 
+
 https://github.com/Citrullin/RIOT/tree/master/pkg/iota-library
 https://github.com/Citrullin/RIOT/tree/master/examples/iota_transaction_pthread
 
