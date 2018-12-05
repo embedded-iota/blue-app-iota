@@ -1,3 +1,25 @@
+# Notice
+
+Not under development, kind of deprecated. 
+I decided to split this wallet into three parts due to seperation of concerns.
+
+IOTA C library: The library contains the basic operation to build an iota
+transaction bundle. POSIX, C99, thread-safe, no malloc. To make sure that
+it runs on any device in any operation system.
+Wallet header files: Defines the universal header files which needs to get
+implemented. Higher level fund managment included.
+Wallet implementation: An operation system, database etc. dependend implementation
+of an iota wallet.
+
+The goal is that every application which includes the wallet header can run on any
+operation system and any implementation.
+
+IOTA C library: https://github.com/embedded-iota/iota-c-library
+RIOS OS (IOTA C library): 
+https://github.com/Citrullin/RIOT/tree/master/pkg/iota-library
+https://github.com/Citrullin/RIOT/tree/master/examples/iota_transaction_pthread
+
+
 # IOTA C Light Wallet
 
 A big thanks to the people of the IOTA implementation of the Ledger Nano S.
