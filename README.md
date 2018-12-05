@@ -6,8 +6,10 @@ I decided to split this wallet into three parts due to seperation of concerns.
 IOTA C library: The library contains the basic operation to build an iota
 transaction bundle. POSIX, C99, thread-safe, no malloc. To make sure that
 it runs on any device in any operation system.
+
 Wallet header files: Defines the universal header files which needs to get
 implemented. Higher level fund managment included.
+
 Wallet implementation: An operation system, database etc. dependend implementation
 of an iota wallet.
 
