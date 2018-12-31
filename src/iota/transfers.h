@@ -15,7 +15,7 @@ typedef struct TX_INPUT {
         uint32_t key_index;
 } TX_INPUT;
 
-void prepare_transfers(char *seed, uint8_t security, TX_OUTPUT *outputs,
+void prepare_transfers(const char *seed, uint8_t security, TX_OUTPUT *outputs,
                        int num_outputs, TX_INPUT *inputs, int num_inputs,
                        char transaction_chars[][2673]);
 

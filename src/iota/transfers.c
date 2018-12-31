@@ -85,14 +85,19 @@ static void get_transaction_chars(const TX_OBJECT tx, char *transaction_chars)
     char_copy(c, tx.nonce, 27);
 }
 
-static void increment_obsolete_tag(unsigned int tag_increment, TX_OBJECT *tx)
+static void modify_obsolete_tag(int tag_modifier, TX_OBJECT *tx)
 {
     char extended_tag[81];
     unsigned char tag_bytes[48];
     rpad_chars(extended_tag, tx->obsoleteTag, NUM_HASH_TRYTES);
     chars_to_bytes(extended_tag, tag_bytes, NUM_HASH_TRYTES);
 
-    bytes_add_u32_mem(tag_bytes, tag_increment);
+    if (tag_modifier >= 0) {
+        bytes_add_u32_mem(tag_bytes, tag_modifier);
+    }
+    else {
+        bytes_sub_u32_mem(tag_bytes, -tag_modifier);
+    }
     bytes_to_chars(tag_bytes, extended_tag, 48);
 
     // TODO: do we need to increment both? Probably only obsoleteTag...
@@ -111,7 +116,7 @@ static void set_bundle_hash(const BUNDLE_CTX *bundle_ctx, TX_OBJECT *txs,
     }
 }
 
-void prepare_transfers(char *seed, uint8_t security, TX_OUTPUT *outputs,
+void prepare_transfers(const char *seed, uint8_t security, TX_OUTPUT *outputs,
                        int num_outputs, TX_INPUT *inputs, int num_inputs,
                        char transaction_chars[][2673])
 {
@@ -180,10 +185,10 @@ void prepare_transfers(char *seed, uint8_t security, TX_OUTPUT *outputs,
         bundle_add_tx(&bundle_ctx, txs[i].value, txs[i].tag, txs[i].timestamp);
     }
 
-    uint32_t tag_increment = bundle_finalize(&bundle_ctx);
+    const int tag_modifier = bundle_finalize(&bundle_ctx);
 
-    // increment the tag in the first transaction object
-    increment_obsolete_tag(tag_increment, &txs[0]);
+    // modify the tag in the first transaction object
+    modify_obsolete_tag(tag_modifier, &txs[0]);
 
     // set the bundle hash in all transaction objects
     set_bundle_hash(&bundle_ctx, txs, num_txs);

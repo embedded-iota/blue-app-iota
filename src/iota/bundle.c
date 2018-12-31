@@ -61,11 +61,35 @@ static void create_bundle_bytes(int64_t value, const char *tag,
     trits_to_bytes(bundle_essence_trits, bytes);
 }
 
+/* @brief Returns whether the base27 encoded ternary number is positive. */
+static bool chars_is_positive(const char *chars, unsigned int chars_len)
+{
+    for (unsigned int i = chars_len; i-- > 0;) {
+        if (chars[i] >= 'N') {
+            return false;
+        }
+        if (chars[i] >= 'A') {
+            return true;
+        }
+    }
+    return false;
+}
+
 uint32_t bundle_add_tx(BUNDLE_CTX *ctx, int64_t value, const char *tag,
                        uint32_t timestamp)
 {
     if (!bundle_has_open_txs(ctx)) {
         THROW(INVALID_STATE);
+    }
+
+    // for the first transaction detect the direction
+    if (ctx->current_index == 0) {
+        if (chars_is_positive(tag, 27)) {
+            ctx->increment_tag = false;
+        }
+        else {
+            ctx->increment_tag = true;
+        }
     }
 
     unsigned char *bytes_ptr = TX_BYTES(ctx);
@@ -284,22 +308,29 @@ bool bundle_validating_finalize(BUNDLE_CTX *ctx, uint32_t change_index,
            bundle_validate_hash(ctx);
 }
 
-unsigned int bundle_finalize(BUNDLE_CTX *ctx)
+int bundle_finalize(BUNDLE_CTX *ctx)
 {
-    unsigned int tag_increment = 0;
+    // the tag can never overflow with a 32bit modifier
+    int tag_modifier = 0;
 
     if (bundle_has_open_txs(ctx)) {
         THROW(INVALID_STATE);
     }
 
     while (!bundle_validate_hash(ctx)) {
-        // increment the tag of the first transaction
-        bytes_increment_trit_area_81(ctx->bytes + 48);
-        tag_increment++;
+        // change the tag of the first transaction
+        if (ctx->increment_tag) {
+            bytes_increment_trit_82(ctx->bytes + 48);
+            tag_modifier++;
+        }
+        else {
+            bytes_decrement_trit_82(ctx->bytes + 48);
+            tag_modifier--;
+        }
     }
 
     // the not normalized hash is already in the result pointer
-    return tag_increment;
+    return tag_modifier;
 }
 
 const unsigned char *bundle_get_address_bytes(const BUNDLE_CTX *ctx,

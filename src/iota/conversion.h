@@ -100,7 +100,12 @@ void bytes_set_last_trit_zero(unsigned char *bytes);
 /** @brief Increment the 82nd trit without carrying overflows across 162nd trit.
  *  @param bytes array consisting of 48 bytes.
  */
-void bytes_increment_trit_area_81(unsigned char *bytes);
+void bytes_increment_trit_82(unsigned char *bytes);
+
+/** @brief Decrement the 82nd trit without carrying overflows across 162nd trit.
+ *  @param bytes array consisting of 48 bytes.
+ */
+void bytes_decrement_trit_82(unsigned char *bytes);
 
 /** @brief Adds a single integer to a 48-byte big-endian integer.
  *  The bytes are changed in such a way, that they are still a vaild big-endian
@@ -109,5 +114,13 @@ void bytes_increment_trit_area_81(unsigned char *bytes);
  *  @param summand unsigned number to add
  */
 void bytes_add_u32_mem(unsigned char *bytes, uint32_t summand);
+
+/** @brief Substracts a single integer to a 48-byte big-endian integer.
+ *  The bytes are changed in such a way, that they are still a vaild big-endian
+ *  binary representation of a ternary number, i.e. the 243th trit is set to 0.
+ *  @param bytes input big-endian 48-byte integer
+ *  @param subtrahend unsigned number to substract
+ */
+void bytes_sub_u32_mem(unsigned char *bytes, uint32_t subtrahend);
 
 #endif // CONVERSION_H

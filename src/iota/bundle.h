@@ -4,20 +4,21 @@
 #include <stdbool.h>
 #include "iota_types.h"
 
-
 #define MAX_BUNDLE_INDEX_SZ 8
 
 typedef struct BUNDLE_CTX {
-        // bundle_bytes holds all of the bundle information in byte encoding
-        unsigned char bytes[MAX_BUNDLE_INDEX_SZ * 96];
+    // bundle_bytes holds all of the bundle information in byte encoding
+    unsigned char bytes[MAX_BUNDLE_INDEX_SZ * 96];
 
-        uint32_t current_index;
-        uint32_t last_index;
+    int64_t values[MAX_BUNDLE_INDEX_SZ];
+    uint32_t indices[MAX_BUNDLE_INDEX_SZ];
 
-        int64_t values[MAX_BUNDLE_INDEX_SZ];
-        uint32_t indices[MAX_BUNDLE_INDEX_SZ];
+    uint8_t current_index;
+    uint8_t last_index;
 
-        unsigned char hash[48]; // bundle hash, when finalized
+    bool increment_tag;
+
+    unsigned char hash[48]; // bundle hash, when finalized
 } BUNDLE_CTX;
 
 /** @brief Initializes the bundle context for a fixed number of transactions.
@@ -67,9 +68,9 @@ uint32_t bundle_add_tx(BUNDLE_CTX *ctx, int64_t value, const char *tag,
 /** @brief Finalizes the bundle by computing the valid bundle hash.
  *  @param ctx the bundle context used.
  *  @return tag increment of the first transaction that was necessary to
- *          generate a valid bundle
+ *          generate a valid bundle. Can be positive or negative.
  */
-unsigned int bundle_finalize(BUNDLE_CTX *ctx);
+int bundle_finalize(BUNDLE_CTX *ctx);
 
 /** @brief Finalizes the bundle, if it has a valid bundle hash.
  *  A bundle is valid, if a) values sum up to 0 b) the index of each input
@@ -88,7 +89,7 @@ bool bundle_validating_finalize(BUNDLE_CTX *ctx, uint32_t change_index,
 /** @brief Returns the (not normalized) hash of the finalized bundle.
  *  @param ctx the bundle context used
  */
-const unsigned char* bundle_get_hash(const BUNDLE_CTX *ctx);
+const unsigned char *bundle_get_hash(const BUNDLE_CTX *ctx);
 
 /** @brief Returns a pointer to the address of the given transaction in
  *         48-byte representation.
@@ -111,7 +112,7 @@ void bundle_get_normalized_hash(const BUNDLE_CTX *ctx, tryte_t *hash_trytes);
  */
 static inline bool bundle_has_open_txs(const BUNDLE_CTX *ctx)
 {
-        return ctx->current_index <= ctx->last_index;
+    return ctx->current_index <= ctx->last_index;
 }
 
 #endif // BUNDLE_H
