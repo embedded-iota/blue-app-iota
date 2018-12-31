@@ -455,7 +455,7 @@ void bytes_decrement_trit_82(unsigned char *bytes)
 {
     uint32_t bigint[12];
     bytes_to_bigint(bytes, bigint);
-    bigint_add(bigint, bigint, TRIT_82);
+    bigint_sub(bigint, bigint, TRIT_82);
     bigint_to_bytes(bigint, bytes);
 }
 
